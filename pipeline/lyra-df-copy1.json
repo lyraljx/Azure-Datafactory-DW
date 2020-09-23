@@ -1,0 +1,267 @@
+{
+	"name": "lyra-df-copy1",
+	"properties": {
+		"description": "Copy data to Azure DW",
+		"activities": [
+			{
+				"name": "ForEach_b81",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.cw_items",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy_b81",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [
+								{
+									"name": "Source",
+									"value": "dbo.@{item().source.table}"
+								},
+								{
+									"name": "Destination",
+									"value": "dbo.@{item().destination.table}"
+								}
+							],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"queryTimeout": {
+										"value": "@item().copySource.queryTimeout",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "SqlDWSink",
+									"allowPolyBase": true,
+									"polyBaseSettings": {
+										"rejectValue": 0,
+										"rejectType": "value",
+										"useTypeDefault": false
+									},
+									"tableOption": "autoCreate"
+								},
+								"enableStaging": true,
+								"stagingSettings": {
+									"linkedServiceName": {
+										"referenceName": "linkedService1_interim",
+										"type": "LinkedServiceReference"
+									},
+									"path": "lyra-dw-filesystem1"
+								},
+								"parallelCopies": 1,
+								"translator": {
+									"value": "@item().copyActivity.translator",
+									"type": "Expression"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SourceDataset_b81",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_table": "@item().source.table"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DestinationDataset_b81",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_table": "@item().destination.table"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"cw_items": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"source": {
+							"table": "recipe_ingredients"
+						},
+						"destination": {
+							"table": "recipe_ingredients"
+						},
+						"copySource": {
+							"queryTimeout": "00:03:00"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "recipe_id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "recipe_id",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "ingredient_id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "ingredient_id",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "amount",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "amount",
+											"type": "Int32"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "testklup"
+						},
+						"destination": {
+							"table": "testklup"
+						},
+						"copySource": {
+							"queryTimeout": null
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "clskey",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "clskey",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "nlskey",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "nlskey",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "cont1",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "cont1",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "cont2",
+											"type": "String"
+										},
+										"sink": {
+											"name": "cont2",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "tt"
+						},
+						"destination": {
+							"table": "tt"
+						},
+						"copySource": {
+							"queryTimeout": null
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "id",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "a",
+											"type": "String"
+										},
+										"sink": {
+											"name": "a",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "b",
+											"type": "String"
+										},
+										"sink": {
+											"name": "b",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "d",
+											"type": "String"
+										},
+										"sink": {
+											"name": "d",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		},
+		"annotations": []
+	}
+}
